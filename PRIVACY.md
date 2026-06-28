@@ -1,6 +1,6 @@
 # DuoBoard — Privacy Policy
 
-*Effective date: June 26, 2026*
+*Effective date: June 28, 2026*
 
 DuoBoard ("the app") is a kanban chore board for couples, published by Hamdi
 Ghorbel. We built it to be as private as a notes app.
@@ -29,13 +29,20 @@ When you create or join a couple:
   on your phone and shared only inside the pairing code you exchange
   privately with your partner. The server stores ciphertext plus a
   last-modified timestamp.
-- **Where:** the self-hosted DuoBoard sync server. No Google/Firebase storage
-  is used for sync data. Only *background push notifications* (a content-free
-  wake-up ping, no chore data) transit Firebase Cloud Messaging so a closed
-  app can be woken instantly.
-- **Account:** none. The couple id is a random 128-bit value generated on
-  your phone and carried only inside the pairing code. No name, email, or
-  phone number is requested or stored.
+- **Photos (if you attach one):** the image is downsampled and recompressed
+  to ≤200 KiB on your phone, then encrypted with the **same** AES-256-GCM key
+  and uploaded to the sync server as an opaque ciphertext blob. The server
+  only stores ciphertext; it never sees the photo. Your partner's phone
+  downloads and decrypts it on demand. The server caps each couple at
+  20 photos / 10 MiB and rate-limits uploads (see
+  [`server/README.md`](../server) → Anti-abuse limits).
+- **Where:** the self-hosted DuoBoard sync server (see [`server/`](../server)).
+  No Google/Firebase storage is used for sync data. Only *background push
+  notifications* (a content-free wake-up ping, no chore data) transit Firebase
+  Cloud Messaging so a closed app can be woken instantly.
+- **Account:** none. The couple id is a random 128-bit value generated on your
+  phone and carried only inside the pairing code. No name, email, or phone
+  number is requested or stored.
 - **Service data:** like any internet service, the server and its hosting
   provider transiently process IP addresses and basic request metadata to
   operate.
@@ -51,7 +58,7 @@ When you create or join a couple:
 ## Children
 
 DuoBoard is intended for adults managing a household together and is not
-directed to children under 13.
+directed at children under 13.
 
 ## Changes
 
