@@ -48,9 +48,8 @@ When you create or join a couple:
   and uploaded to the sync server as an opaque ciphertext blob. The server
   only stores ciphertext; it never sees the photo. Your partner's phone
   downloads and decrypts it on demand. The server caps each couple at
-  20 photos / 10 MiB and rate-limits uploads (see
-  [`server/README.md`](../server) → Anti-abuse limits).
-- **Where:** the self-hosted DuoBoard sync server (see [`server/`](../server)).
+  20 photos / 10 MiB and rate-limits uploads.
+- **Where:** the self-hosted DuoBoard sync server.
   No Google/Firebase storage is used for sync data. Only *background push
   notifications* transit Firebase Cloud Messaging so a closed app can be
   woken instantly. A push may carry encrypted event ciphertext; Firebase and
