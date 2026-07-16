@@ -8,27 +8,41 @@ Ghorbel. We built it to be as private as a notes app.
 ## The short version
 
 - No ads, no analytics, no trackers, no selling of data. Ever.
-- Your chores live in a local database on your phone.
+- Your chores live in a local database on your phone. Android automatic backup
+  and device-transfer backup are disabled for DuoBoard data.
 - If — and only if — you turn on couple sync, your board is stored
   **end-to-end encrypted** on the self-hosted sync server so your partner's
   phone can receive it. We cannot read it. The server operator cannot read it.
-  Only the two paired phones hold the decryption key.
+   Only devices given the pairing code hold the decryption key. Anyone with
+   that code can join, so share it privately; the service permits up to ten
+   registered devices for a couple.
 
 ## Data stored on your device
 
-Chores (titles, notes, dates, points), partner display names and colors, and
-app settings are stored in a local database. They never leave your device
-unless you enable sync or use the manual export feature.
+Chores (titles, notes, dates, points), shopping lists, weekly check-ins,
+partner display names and colors, and app settings are stored in a local
+database. They never leave your device unless you enable sync or use the manual
+export feature. The pairing key is encrypted with a non-exportable Android
+Keystore key.
+
+If you enable the **system calendar overlay** (Settings → Appearance &amp; behavior → Show
+system calendar events), the app reads event titles, times, locations, and
+descriptions from your phone's calendar (via `CalendarContract`) to display
+them alongside chores in the calendar view. Calendar data is read-only — the
+app never writes to or modifies your calendar. Calendar events are not uploaded
+or synced to the DuoBoard server; they stay on your device.
 
 ## Data processed if you enable couple sync (optional)
 
 When you create or join a couple:
 
-- **What is uploaded:** your chores and partner display names, encrypted on
-  your phone with AES-256-GCM before upload. The encryption key is generated
-  on your phone and shared only inside the pairing code you exchange
-  privately with your partner. The server stores ciphertext plus a
-  last-modified timestamp.
+- **What is uploaded:** chores, pinned notes, chore comments, tags, lists,
+  weekly check-ins and their optional notes, board configuration, and display
+  profiles are encrypted on your phone with
+  AES-256-GCM before upload. The pairing key is generated on your phone and
+  shared only inside the pairing code you exchange privately with your partner.
+  The server stores ciphertext plus last-modified timestamps and opaque record
+  identifiers.
 - **Photos (if you attach one):** the image is downsampled and recompressed
   to ≤200 KiB on your phone, then encrypted with the **same** AES-256-GCM key
   and uploaded to the sync server as an opaque ciphertext blob. The server
@@ -38,8 +52,11 @@ When you create or join a couple:
   [`server/README.md`](../server) → Anti-abuse limits).
 - **Where:** the self-hosted DuoBoard sync server (see [`server/`](../server)).
   No Google/Firebase storage is used for sync data. Only *background push
-  notifications* (a content-free wake-up ping, no chore data) transit Firebase
-  Cloud Messaging so a closed app can be woken instantly.
+  notifications* transit Firebase Cloud Messaging so a closed app can be
+  woken instantly. A push may carry encrypted event ciphertext; Firebase and
+   the server cannot read it. FCM registration tokens and normal network
+   metadata are processed to deliver these notifications. The sync server keeps
+   a token until it is replaced, unregistered, or has not refreshed for 90 days.
 - **Account:** none. The couple id is a random 128-bit value generated on your
   phone and carried only inside the pairing code. No name, email, or phone
   number is requested or stored.
@@ -47,13 +64,21 @@ When you create or join a couple:
   provider transiently process IP addresses and basic request metadata to
   operate.
 
+## Voice input
+
+Voice input is available only on Android 12 or later when an on-device speech
+recognizer is installed. DuoBoard does not fall back to a cloud recognizer, so
+voice audio and transcripts stay on your phone.
+
 ## Data deletion
 
-- Turning off sync ("Leave couple") stops all uploads; uninstalling the app
-  deletes the local database.
-- To remove synced ciphertext from the server, contact us at the address
-  below with your couple ID, or simply leave the couple on both phones — the
-  data is unreadable without your key in any case.
+- **Leave couple** disconnects this phone, removes its FCM registration, and
+  keeps this phone's local board.
+- **Delete shared cloud copy** in Settings → Sync erases the encrypted server
+  copy, removes registered devices, and disconnects both phones. Each phone
+  keeps its local board unless its owner deletes or uninstalls the app.
+- Manual exports are user-managed files. They are not included in Android
+  automatic backup and are not removed by DuoBoard.
 
 ## Children
 
